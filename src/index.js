@@ -14,7 +14,6 @@ const expressApp = express()
 const cert = fs.readFileSync(process.env.CertPath) || './sslcert/fullchain.pem'
 const key = fs.readFileSync(process.env.KeyPath) || './sslcert/privkey.pem'
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL
-const DISCORD_WEBHOOK_URL_SUPPORT = process.env.DISCORD_WEBHOOK_URL_SUPPORT
 const DISCORD_WEBHOOK_AVATAR_URL = process.env.DISCORD_WEBHOOK_AVATAR_URL
 const DISCORD_WEBHOOK_USERNAME = process.env.DISCORD_WEBHOOK_USERNAME
 const PORT = process.env.PORT || 3004
@@ -55,7 +54,7 @@ const interceptHandler = (name, handler) => async function (...args) {
     if (name === 'message') {
         // pass on extra information along with the client
         client._data = {
-            DISCORD_WEBHOOK_URL_SUPPORT,
+            DISCORD_WEBHOOK_URL,
             DISCORD_WEBHOOK_AVATAR_URL,
             DISCORD_WEBHOOK_USERNAME,
         }
