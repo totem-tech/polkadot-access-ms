@@ -19,6 +19,8 @@ const DISCORD_WEBHOOK_USERNAME = process.env.DISCORD_WEBHOOK_USERNAME
 const PORT = process.env.PORT || 3004
 const server = https.createServer({ cert, key }, expressApp)
 const socket = socketIO.listen(server)
+let pingCount = 0
+const ts = () => new Date().toISOString()
 const events = {
     /**
      * @name    query
@@ -35,12 +37,12 @@ const events = {
         if (!isFn(callback)) return
         const requestId = uuid.v1()
         try {
-            console.log('New request ', {requestId, func, args})
+            console.log(ts(), 'New request ', {requestId, func, args})
             const result = await query(func, args, multi)
-            console.log({ requestId, result })
+            console.log(ts(), { requestId, result })
             callback(null, result)
         } catch (error) {
-            console.log('Request failed \n', JSON.stringify({
+            console.log(ts(), 'Request failed \n', JSON.stringify({
                 requestId,
                 error,
             }))
@@ -115,18 +117,21 @@ socket.on('connection', client => Object.keys(events).forEach(name =>
 server.listen(PORT, () =>
     console.log(`Totem Polkadot Micro Service started. Websocket listening on port ${PORT} (https)`)
 )
-
-let pingCount = 0
 const pingForever = async () => {
     pingCount++
     try {
-        await query('api.query.system.account', '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY')
-        console.log('Ping success', { pingCount })
+        const result = await query(
+            'api.query.system.account',
+            pingCount % 2 === 0 
+                ? '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
+                : '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
+        )
+        console.log(ts(), `Ping ${pingCount} result`, result)
     } catch (error) {
-        console.log('Ping error', { pingCount, error })
+        console.log(`Ping ${pingCount} error`, error)
     }
     // ping every 30 minutes be retrieving balances
-    setTimeout(pingForever, 30 * 60 * 1000)
+    setTimeout(pingForever, 15 * 60 * 1000)
 }
 
 // attempt to establish a connection to the Polkadot Network
