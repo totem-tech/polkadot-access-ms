@@ -26,8 +26,8 @@ export const getConnection = async (nodeUrl = Node_URL) => {
         return connection
     }
 
-    console.log('Connecting to Polkadot Network', Node_URL)
-    const provider = new WsProvider(Node_URL);
+    console.log('Connecting to Polkadot Network', nodeUrl)
+    const provider = new WsProvider(nodeUrl);
     connectionPromsie = ApiPromise.create({ provider });
     const api = await connectionPromsie
     console.log('Connected to Polkadot Network')

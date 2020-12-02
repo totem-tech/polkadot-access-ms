@@ -19,7 +19,6 @@ const DISCORD_WEBHOOK_USERNAME = process.env.DISCORD_WEBHOOK_USERNAME
 const PORT = process.env.PORT || 3004
 const server = https.createServer({ cert, key }, expressApp)
 const socket = socketIO.listen(server)
-
 const events = {
     /**
      * @name    query
@@ -32,20 +31,21 @@ const events = {
      *                                  Arguments:
      *                                  @err    String
      */
-    'query': async (func, args = [], multi = false, callback) => {
+    'query': async (func, args = [], multi = false, callback, isPing = false) => {
         if (!isFn(callback)) return
+        const requestId = uuid.v1()
         try {
+            console.log('New request ', {requestId, func, args})
             const result = await query(func, args, multi)
+            console.log({ requestId, result })
             callback(null, result)
-        } catch (err) {
+        } catch (error) {
             console.log('Request failed \n', JSON.stringify({
-                func,
-                args,
-                error: err,
+                requestId,
+                error,
             }))
-            callback(`${err}`)
+            callback(`${error}`)
         }
-
     },
 }
 const interceptHandler = (name, handler) => async function (...args) {
@@ -116,13 +116,23 @@ server.listen(PORT, () =>
     console.log(`Totem Polkadot Micro Service started. Websocket listening on port ${PORT} (https)`)
 )
 
+let pingCount = 0
+const pingForever = async () => {
+    pingCount++
+    try {
+        await query('api.query.system.account', '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY')
+        console.log('Ping success', { pingCount })
+    } catch (error) {
+        console.log('Ping error', { pingCount, error })
+    }
+    // ping every 30 minutes be retrieving balances
+    setTimeout(pingForever, 30 * 60 * 1000)
+}
+
 // attempt to establish a connection to the Polkadot Network
 getConnection()
-    // .then(({ api }) => console.log('api.query.balances.freeBalance', api.query.balances))
+    .then(pingForever)
     .catch(err => {
         console.log('Polkadot: connection failed. Error:\n', err)
         process.exit(1)
     })
-
-// query('api.query.system.account', '', false)
-
