@@ -117,7 +117,7 @@ socket.on('connection', client => Object.keys(events).forEach(name =>
 server.listen(PORT, () =>
     console.log(`Totem Polkadot Micro Service started. Websocket listening on port ${PORT} (https)`)
 )
-const pingForever = async () => {
+const pingForever = async (forever = true) => {
     pingCount++
     try {
         const result = await query(
@@ -131,12 +131,12 @@ const pingForever = async () => {
         console.log(`Ping ${pingCount} error`, error)
     }
     // ping every 30 minutes be retrieving balances
-    setTimeout(pingForever, 15 * 60 * 1000)
+    forever && setTimeout(pingForever, 15 * 60 * 1000)
 }
 
 // attempt to establish a connection to the Polkadot Network
 getConnection()
-    .then(pingForever)
+    .then(() => pingForever(false))
     .catch(err => {
         console.log('Polkadot: connection failed. Error:\n', err)
         process.exit(1)
