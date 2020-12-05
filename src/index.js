@@ -11,8 +11,8 @@ import { isFn } from './utils/utils'
 import { getConnection, query } from './polkadot'
 
 const expressApp = express()
-const cert = fs.readFileSync(process.env.CertPath) || './sslcert/fullchain.pem'
-const key = fs.readFileSync(process.env.KeyPath) || './sslcert/privkey.pem'
+const cert = fs.readFileSync(process.env.CertPath || './sslcert/fullchain.pem')
+const key = fs.readFileSync(process.env.KeyPath || './sslcert/privkey.pem')
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL
 const DISCORD_WEBHOOK_AVATAR_URL = process.env.DISCORD_WEBHOOK_AVATAR_URL
 const DISCORD_WEBHOOK_USERNAME = process.env.DISCORD_WEBHOOK_USERNAME
