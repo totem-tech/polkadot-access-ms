@@ -32,8 +32,10 @@ export const getConnection = async (nodeUrl = Node_URL) => {
             console.log('Provider diconnected. Attempting to reconnect....')
             // provider somehow got disconnected. attempt to reconnect
             connection.provider.connect()
-            // wait 5 seconds for reconnection
-            await PromisE.delay(5000)
+            // wait 2 seconds for reconnection
+            await PromisE.delay(2000)
+            // wait another 3 seconds if still not connected
+            if (!connection.provider.isConnected) await PromisE.delay(3000)
             console.log('Provider reconnected', connection.provider.isConnected)
         }
         return connection
