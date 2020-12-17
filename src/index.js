@@ -18,7 +18,7 @@ const DISCORD_WEBHOOK_AVATAR_URL = process.env.DISCORD_WEBHOOK_AVATAR_URL
 const DISCORD_WEBHOOK_USERNAME = process.env.DISCORD_WEBHOOK_USERNAME
 const PORT = process.env.PORT || 3004
 const server = https.createServer({ cert, key }, expressApp)
-const socket = socketIO.listen(server)
+const socket = socketIO(server)
 let pingCount = 0
 const ts = () => new Date().toISOString()
 const events = {
@@ -33,7 +33,7 @@ const events = {
      *                                  Arguments:
      *                                  @err    String
      */
-    'query': async (func, args = [], multi = false, callback, isPing = false) => {
+    query: async (func, args = [], multi = false, callback, isPing = false) => {
         if (!isFn(callback)) return
         const requestId = uuid.v1()
         try {
